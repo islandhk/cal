@@ -1,0 +1,11 @@
+# Packages
+node_modules
+
+# Env
+src/bot/settings.ts
+
+# Dist
+dist/
+
+# System
+.DS_Store

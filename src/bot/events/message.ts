@@ -20,6 +20,7 @@ abstract class MessageEvent extends Event {
     if (commandName) {
       const command = this.client.commands.get(commandName);
       if (command) {
+        console.log("[COMMAND] " + message.author.tag + " used " + commandName);
         if (
           command.ownerOnly &&
           !settings.BOT_OWNER_ID.includes(message.author.id)

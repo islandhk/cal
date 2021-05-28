@@ -9,7 +9,7 @@ abstract class ReadyEvent extends Event {
   }
 
   async exec() {
-    console.log("Ready!");
+    console.log("[Bot] Ready.");
   }
 }
 

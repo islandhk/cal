@@ -74,6 +74,8 @@ abstract class Timetable extends Command {
           embed.addField(x.name, x.location + ", on " + x.when);
         });
 
+        m.delete();
+
         return message.channel.send(embed);
       });
   }

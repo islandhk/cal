@@ -3,3 +3,5 @@ export interface Event {
   when: string;
   location: string;
 }
+
+export type EventArray = Event[];

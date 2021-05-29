@@ -30,7 +30,7 @@ abstract class Timetable extends Command {
 
         const ics: string = await axios
           .get(calendar.calendar)
-          .then((stuff) => stuff.data);
+          .then(async (stuff) => await stuff.data);
 
         const data = parseICS(ics);
 
@@ -39,14 +39,14 @@ abstract class Timetable extends Command {
         let date = new Date();
 
         for (let event in data) {
-          let info = data[event];
-          if (info.start! == date) {
+          const info = data[event];
+
+          if (info.start?.toDateString() == date.toDateString()) {
             result.push({
-              name: info.description!.substring(9),
-              when: info.start!.toLocaleString(),
+              name: info.description?.substring(9),
+              when: info.start?.toLocaleString(),
               location: info.location!,
             });
-            break;
           }
         }
 

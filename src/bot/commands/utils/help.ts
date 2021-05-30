@@ -2,12 +2,13 @@ import Command from "../../struct/Command";
 import { Message, MessageEmbed } from "discord.js";
 import { stripIndents } from "common-tags";
 
-abstract class HelpCommand extends Command {
+abstract class Help extends Command {
   constructor() {
     super({
       name: "help",
       aliases: ["h"],
-      description: "Display a list of all my commands!",
+      description: "Display a list of all commands",
+      category: "Information",
     });
   }
 
@@ -52,4 +53,4 @@ abstract class HelpCommand extends Command {
   }
 }
 
-export default HelpCommand;
+export default Help;

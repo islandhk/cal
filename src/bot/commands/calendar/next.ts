@@ -12,6 +12,7 @@ abstract class Next extends Command {
       name: "next",
       aliases: ["n"],
       description: "View what the next lesson is.",
+      category: "Calendar",
     });
   }
 

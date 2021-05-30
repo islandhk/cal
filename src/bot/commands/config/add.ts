@@ -9,6 +9,7 @@ abstract class Add extends Command {
       name: "add",
       aliases: ["a"],
       description: "Add your calendar for viewing!",
+      category: "Configuration",
     });
   }
 

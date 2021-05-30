@@ -9,9 +9,10 @@ import { EventArray } from "../../types/Event";
 abstract class Timetable extends Command {
   constructor() {
     super({
-      name: "tomorrow",
-      aliases: ["t"],
-      description: "View your timetable for the day after.",
+      name: "timetable",
+      aliases: ["tt"],
+      description: "View your timetable for the day.",
+      category: "Calendar",
     });
   }
 
@@ -37,7 +38,6 @@ abstract class Timetable extends Command {
         let result: EventArray = [];
 
         let date = new Date();
-        date.setDate(date.getDate() + 1);
 
         for (let event in data) {
           const info = data[event];
@@ -52,7 +52,7 @@ abstract class Timetable extends Command {
         }
 
         let embed = new MessageEmbed()
-          .setTitle("Timetable for " + date.toDateString())
+          .setTitle("Timetable " + date.toDateString())
           .setColor("RANDOM")
           .setTimestamp()
           .setFooter(

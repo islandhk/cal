@@ -1,7 +1,7 @@
 import Command from "../../struct/Command";
 import { Message } from "discord.js";
 import User from "../../../models/user";
-import { parseICS } from "ical";
+import { CalendarComponent, parseICS } from "ical";
 import axios from "axios";
 import { MessageEmbed } from "discord.js";
 import { Event } from "../../types/Event";
@@ -16,7 +16,7 @@ abstract class Next extends Command {
     });
   }
 
-  async exec(message: Message) {
+  async exec(message: Message, args: string[]) {
     return message.channel
       .send("<a:loading:847463122423513169> Loading...")
       .then(async (m) => {
@@ -38,6 +38,52 @@ abstract class Next extends Command {
         let result: Event | undefined;
 
         let date = new Date();
+
+        if (args[0]) {
+          let process = [...args[0]];
+
+          for (let char in process) {
+            process[char] = process[char].toLowerCase();
+          }
+
+          process[0] = process[0].toUpperCase();
+
+          args[0] = process.join("");
+
+          let embed = new MessageEmbed()
+            .setTitle("The next " + args[0] + " lesson is on...")
+            .setColor("RANDOM");
+
+          let check: CalendarComponent | undefined;
+
+          for (let event in data) {
+            let info = data[event];
+
+            if (info.start! >= date) {
+              if (info.description?.includes(args[0])) {
+                check = info;
+                break;
+              }
+            }
+          }
+
+          if (!check) {
+            return message.channel.send(
+              "<:cross:847460147806994452> There is no lesson by that name."
+            );
+          } else {
+            embed.setDescription(
+              check.start!.toLocaleString() + " at " + check.location! + "."
+            );
+          }
+
+          m.delete();
+          message.channel
+            .send("<@" + message.author.id + ">")
+            .then((msg) => msg.delete());
+
+          return message.channel.send(embed);
+        }
 
         for (let event in data) {
           let info = data[event];

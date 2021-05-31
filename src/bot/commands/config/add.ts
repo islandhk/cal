@@ -1,5 +1,5 @@
 import Command from "../../struct/Command";
-import { Message } from "discord.js";
+import { Message, MessageEmbed } from "discord.js";
 import User from "../../../models/user";
 import axios from "axios";
 
@@ -14,10 +14,34 @@ abstract class Add extends Command {
   }
 
   async exec(message: Message, args: string[]) {
+    const helpEmbed1 = new MessageEmbed()
+      .setTitle("Okay, it looks like you're confused.")
+      .setDescription("*Don't worry, we'll take you through it...*")
+      .addField(
+        "Firstly, get on Gateway.",
+        "[Here you go!](https://tg.esf.edu.hk/)"
+      )
+      .addField(
+        'Next, click on "Sync to Google Calendar".',
+        "*It's above the calendar on the right hand side. Here's a picture...*"
+      )
+      .setImage("https://mcs.is-inside.me/RLgYt2U2.png");
+
+    const helpEmbed2 = new MessageEmbed()
+      .addField('Now, hit the "Copy" button.', "*Altenatively, copy the URL.*")
+      .addField(
+        "Get on Discord...",
+        "*...and run `-a <your_url_without_<>s_here>` to get started!*"
+      )
+      .addField("Congrats!", "You're done!");
+
     if (!args[0])
-      return message.channel.send(
-        "<:cross:847460147806994452> Please provide calendar URL."
-      );
+      return message.channel.send("<@" + message.author.id + ">").then((m) => {
+        m.delete();
+        message.channel.send(helpEmbed1);
+        message.channel.send(helpEmbed2);
+      });
+
     return message.channel
       .send("<a:loading:847463122423513169> Loading...")
       .then(async (m) => {

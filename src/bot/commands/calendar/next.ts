@@ -40,18 +40,17 @@ abstract class Next extends Command {
         let date = new Date();
 
         if (args[0]) {
-          let process = [...args[0]];
+          for (let element in args) {
+            let first = args[element][0];
+            first = first.toUpperCase();
 
-          for (let char in process) {
-            process[char] = process[char].toLowerCase();
+            args[element] = first + args[element].slice(1);
           }
 
-          process[0] = process[0].toUpperCase();
-
-          args[0] = process.join("");
+          const lesson = args.join(" ");
 
           let embed = new MessageEmbed()
-            .setTitle("The next " + args[0] + " lesson is on...")
+            .setTitle("The next " + lesson + " lesson is on...")
             .setColor("RANDOM");
 
           let check: CalendarComponent | undefined;
@@ -60,7 +59,7 @@ abstract class Next extends Command {
             let info = data[event];
 
             if (info.start! >= date) {
-              if (info.description?.includes(args[0])) {
+              if (info.description?.includes(lesson)) {
                 check = info;
                 break;
               }

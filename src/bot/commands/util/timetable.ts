@@ -43,8 +43,8 @@ abstract class Timetable extends Command {
 
           if (info.start?.toDateString() == date.toDateString()) {
             result.push({
-              name: info.description?.substring(9),
-              when: info.start?.toLocaleString(),
+              name: info.description!.substring(9),
+              when: info.start!.toLocaleString(),
               location: info.location!,
             });
           }
@@ -54,7 +54,9 @@ abstract class Timetable extends Command {
           .setTitle("Timetable")
           .setColor("RANDOM")
           .setTimestamp()
-          .setFooter("Don't be late!");
+          .setFooter(
+            "Timetable for " + message.author.tag + " • Don't be late!"
+          );
 
         if (!result[0]) {
           m.delete();
@@ -69,7 +71,7 @@ abstract class Timetable extends Command {
         }
 
         result.map((x) => {
-          embed.addField(x.name, x.location + ", at" + x.when);
+          embed.addField(x.name, x.location + ", on " + x.when);
         });
 
         return message.channel.send(embed);

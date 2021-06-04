@@ -25,7 +25,7 @@ abstract class Timetable extends Command {
         });
 
         if (!calendar)
-          return message.channel.send(
+          return m.edit(
             "<:cross:847460147806994452> Please add your calendar with `-add <url>`."
           );
 

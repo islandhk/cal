@@ -44,7 +44,7 @@ abstract class Timetable extends Command {
 
           if (info.start?.toDateString() == date.toDateString()) {
             result.push({
-              name: info.description!.substring(9),
+              name: info.description!,
               when: info.start!.toLocaleString(),
               location: info.location!,
             });
@@ -72,7 +72,10 @@ abstract class Timetable extends Command {
         }
 
         result.map((x) => {
-          embed.addField(x.name, x.location + ", on " + x.when);
+          if (!x.name.includes("Subject"))
+            embed.addField(x.name, x.location + ", on " + x.when);
+          else
+            embed.addField(x.name.substring(9), x.location + ", on " + x.when);
         });
 
         message.channel

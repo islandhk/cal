@@ -1,10 +1,10 @@
 {
-  "name": "typescript-bot-template",
+  "name": "cal",
   "version": "1.0.0",
-  "description": "Discord bot template written with typescript.",
+  "description": "Cal, the Discord bot for The Gateway..",
   "main": "./src/bot.ts",
-  "repository": "https://github.com/iColtz/typescript-bot-template",
-  "author": "iColtz",
+  "repository": "https://github.com/geenva/cal",
+  "author": "geneva",
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only ./src/bot.ts",

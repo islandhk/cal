@@ -4,7 +4,7 @@ import User from "../../../models/user";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method == "POST") {
-    const { id, calendar, password } = req.body;
+    const { id, calendar } = req.body;
 
     if (!id || !calendar) return res.status(500).send("data_incomplete");
 

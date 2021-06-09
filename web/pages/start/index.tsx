@@ -2,6 +2,7 @@ import { useSession } from "next-auth/client";
 import styles from "../../styles/Start.module.css";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Start() {
   const [URL, setURL] = useState(null);
@@ -9,10 +10,6 @@ export default function Start() {
   const [session, loading] = useSession();
 
   const router = useRouter();
-
-  const redirect = () => {
-    router.push("/api/auth/signin");
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,19 +32,30 @@ export default function Start() {
   };
 
   return (
-    <main className={styles.main}>
-      {session ? null : redirect()}
-      <h1>Welcome, {session.user.name}.</h1>
+    <>
+      {session ? (
+        <main className={styles.main}>
+          <h1>Welcome, {session.user.name}.</h1>
 
-      <p>What's your Gateway URL?</p>
-      <form>
-        <input
-          type="text"
-          onChange={handleChange}
-          placeholder="Your Gateway URL"
-        />
-        <input onClick={handleSubmit} type="submit" value="Submit" />
-      </form>
-    </main>
+          <p>What's your Gateway URL?</p>
+          <form>
+            <input
+              type="text"
+              onChange={handleChange}
+              placeholder="Your Gateway URL"
+            />
+            <input onClick={handleSubmit} type="submit" value="Submit" />
+          </form>
+        </main>
+      ) : (
+        <main className={styles.main}>
+          <Link href="/api/auth/signin">
+            <a>
+              <h1>Click here to sign in.</h1>
+            </a>
+          </Link>
+        </main>
+      )}
+    </>
   );
 }

@@ -25,6 +25,7 @@ export default function Start() {
       body: JSON.stringify({
         id: session.id,
         calendar: URL,
+        password: process.env.PASSWORD,
       }),
     });
   };

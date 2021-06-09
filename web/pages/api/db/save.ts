@@ -6,9 +6,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method == "POST") {
     const { id, calendar, password } = req.body;
 
-    if (password !== process.env.PASSWORD)
-      return res.status(500).send("unauthorized");
-
     if (!id || !calendar) return res.status(500).send("data_incomplete");
 
     const data = await User.findOne({

@@ -6,5 +6,5 @@ const UserSchema = new Schema<IUser>({
   calendar: { type: String, required: true },
 });
 
-const User = mongoose.model<IUser>("Users", UserSchema);
+const User = mongoose.model<IUser>("users", UserSchema);
 export default User;

@@ -2,10 +2,8 @@ import { useSession } from "next-auth/client";
 import styles from "../../styles/Start.module.css";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { connect } from "mongoose";
-import User from "../../models/user";
 
-export default async function Start() {
+export default function Start() {
   const [URL, setURL] = useState(null);
 
   const [session, loading] = useSession();
@@ -18,6 +16,17 @@ export default async function Start() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    fetch("/api/db/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: session.id,
+        calendar: URL,
+      }),
+    });
   };
 
   const handleChange = (e) => {

@@ -4,7 +4,7 @@ import User from "../../../models/user";
 import { parseICS } from "ical";
 import axios from "axios";
 import { MessageEmbed } from "discord.js";
-import { EventArray } from "../../types/Event";
+import { EventArray } from "../../types/Events";
 
 abstract class Timetable extends Command {
   constructor() {

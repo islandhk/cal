@@ -4,7 +4,7 @@ import User from "../../../models/user";
 import { CalendarComponent, parseICS } from "ical";
 import axios from "axios";
 import { MessageEmbed } from "discord.js";
-import { Event } from "../../types/Event";
+import { Event } from "../../types/Events";
 
 abstract class Next extends Command {
   constructor() {

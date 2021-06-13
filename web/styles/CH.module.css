@@ -1,3 +1,14 @@
 .main {
   padding: 5vh 10vw;
 }
+
+.link {
+  color: lightblue;
+}
+
+.link:active,
+.link:hover,
+.link:focus {
+  color: white;
+  text-decoration: underline;
+}

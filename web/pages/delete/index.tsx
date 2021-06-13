@@ -1,5 +1,6 @@
 import { useSession } from "next-auth/client";
 import styles from "../../styles/Default.module.css";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -13,22 +14,18 @@ export default function Start() {
     e.preventDefault();
 
     setMessage(<h4>Please wait...</h4>);
-
     await fetch("/api/db/action", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        action: "SAVE",
+        action: "DELETE",
         id: session.id,
-        calendar: URL,
       }),
-    }).then(() => {
-      setMessage(
-        <h4>Successfully posted, check your calendar with -tt on Cal.</h4>
-      );
-    });
+    }).then(() =>
+      setMessage(<h4>Your data has been successfully deleted.</h4>)
+    );
   };
 
   const handleChange = (e) => {
@@ -39,24 +36,12 @@ export default function Start() {
     <>
       {session ? (
         <main className={styles.main}>
-          <h1>Welcome, {session.user.name}.</h1>
+          <h1>Are you sure, {session.user.name}?</h1>
 
-          <h4>What's your Gateway URL?</h4>
+          <p></p>
           <form>
-            <input
-              type="text"
-              onChange={handleChange}
-              placeholder="Your Gateway URL"
-            />
-            <input onClick={handleSubmit} type="submit" value="Submit" />
+            <input onClick={handleSubmit} type="submit" value="Yes, I am." />
           </form>
-          <Link href="docs/calendar-help">
-            <a>
-              <i>
-                <p>Help, what's this?</p>
-              </i>
-            </a>
-          </Link>
 
           {Message}
 
@@ -73,6 +58,7 @@ export default function Start() {
               <h1>Click here to sign in.</h1>
             </a>
           </Link>
+
           <Link href="/">
             <a>
               <p>&larr; Go back</p>

@@ -45,6 +45,13 @@ export default function Start() {
             />
             <input onClick={handleSubmit} type="submit" value="Submit" />
           </form>
+          <Link href="docs/calendar-help">
+            <a>
+              <i>
+                <p>Help, what's this?</p>
+              </i>
+            </a>
+          </Link>
         </main>
       ) : (
         <main className={styles.main}>

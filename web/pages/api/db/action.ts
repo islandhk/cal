@@ -8,6 +8,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     let User = Usr;
     if (mongoose.models && mongoose.models.User) User = mongoose.models.users;
 
+    if (
+      req.headers.origin !== "http://localhost:3000" &&
+      req.headers.origin !== "https://callou.vercel.app"
+    )
+      return res.status(500).send("INVALID_ORIGIN");
+
     const { action } = req.body;
 
     if (action == "SAVE") {

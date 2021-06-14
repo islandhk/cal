@@ -26,6 +26,13 @@ export default function Home() {
             </a>
           </Link>
 
+          <Link href="/cal">
+            <a className={styles.card}>
+              <h2>View &rarr;</h2>
+              <p>Check your calendar.</p>
+            </a>
+          </Link>
+
           <Link href="https://discord.com/oauth2/authorize?client_id=847450876918104094&scope=bot&permissions=2214980672">
             <a className={styles.card}>
               <h2>Invite &rarr;</h2>
@@ -37,6 +44,13 @@ export default function Home() {
             <a className={styles.card}>
               <h2>Server &rarr;</h2>
               <p>Join our Discord server.</p>
+            </a>
+          </Link>
+
+          <Link href="https://github.com/geenva/cal">
+            <a className={styles.card}>
+              <h2>Source Code &rarr;</h2>
+              <p>View Cal/Callou's source code.</p>
             </a>
           </Link>
         </div>

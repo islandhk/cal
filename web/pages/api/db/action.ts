@@ -1,10 +1,13 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import connect from "../../../middleware/db/connect";
-import User from "../../../models/user";
+import Usr from "../../../models/user";
 import mongoose from "mongoose";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method == "POST") {
+    let User = Usr;
+    if (mongoose.models && mongoose.models.User) User = mongoose.models.users;
+
     const { action } = req.body;
 
     if (action == "SAVE") {

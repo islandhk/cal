@@ -1,7 +1,6 @@
 import Command from "../../struct/Command";
 import { Message, MessageEmbed } from "discord.js";
 import User from "../../../models/user";
-import { IUser } from "../../types/Models";
 
 abstract class Help extends Command {
   constructor() {
@@ -25,7 +24,7 @@ abstract class Help extends Command {
         "<:cross:847460147806994452> Invalid user, please mention or provide user ID."
       );
     } else {
-      const data: IUser = await User.findOne({
+      const data = await User.findOne({
         id: user.id,
       });
 
@@ -33,7 +32,7 @@ abstract class Help extends Command {
         .setTitle("Data for " + user.username)
         .setColor("RANDOM")
         .addField("ID", user.id)
-        .addField("Cal", data.calendar)
+        .addField("Cal", data!.calendar)
         .addField("In Database", data ? true : false);
 
       return message.channel.send(embed1);

@@ -10,6 +10,7 @@ abstract class ReadyEvent extends Event {
 
   async exec() {
     console.log("[Bot] Ready.");
+    this.client.user?.setActivity("your calendar", { type: "WATCHING" });
   }
 }
 

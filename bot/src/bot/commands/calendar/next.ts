@@ -67,6 +67,7 @@ abstract class Next extends Command {
           }
 
           if (!check) {
+            m.delete();
             return message.channel.send(
               "<:cross:847460147806994452> There is no lesson by that name."
             );

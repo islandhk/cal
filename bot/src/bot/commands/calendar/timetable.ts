@@ -52,7 +52,7 @@ abstract class Timetable extends Command {
         }
 
         let embed = new MessageEmbed()
-          .setTitle("Timetable " + date.toDateString())
+          .setTitle("Timetable for " + date.toDateString())
           .setColor("RANDOM")
           .setTimestamp()
           .setFooter(

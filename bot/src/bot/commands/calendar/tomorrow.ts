@@ -68,7 +68,7 @@ abstract class Timetable extends Command {
             .then((msg) => msg.delete());
 
           return message.channel.send(
-            "<:cross:847460147806994452> There are no lessons today."
+            "<:cross:847460147806994452> There are no lessons tomorrow."
           );
         }
 

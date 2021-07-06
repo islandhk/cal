@@ -1,6 +1,6 @@
 import Command from "../../struct/Command";
 import { Message, MessageEmbed } from "discord.js";
-import User from "../../../models/user";
+import prisma from "../../../database/export/Database";
 
 abstract class Help extends Command {
   constructor() {
@@ -24,16 +24,19 @@ abstract class Help extends Command {
         "<:cross:847460147806994452> Invalid user, please mention or provide user ID."
       );
     } else {
-      const data = await User.findOne({
-        id: user.id,
+      const data = await prisma.main.findFirst({
+        where: {
+          user: user.id,
+        },
       });
 
       const embed1 = new MessageEmbed()
         .setTitle("Data for " + user.username)
         .setColor("RANDOM")
         .addField("ID", user.id)
-        .addField("Cal", data!.calendar)
         .addField("In Database", data ? true : false);
+
+      if (data) embed1.addField("Cal", data.url);
 
       return message.channel.send(embed1);
     }

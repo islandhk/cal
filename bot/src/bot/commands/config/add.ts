@@ -1,6 +1,6 @@
 import Command from "../../struct/Command";
 import { Message, MessageEmbed } from "discord.js";
-import User from "../../../models/user";
+import prisma from "../../../database/export/Database";
 import axios from "axios";
 
 abstract class Add extends Command {
@@ -45,46 +45,55 @@ abstract class Add extends Command {
     return message.channel
       .send("<a:loading:847463122423513169> Loading...")
       .then(async (m) => {
-        return await axios
+        await axios
           .get(args[0])
           .then(async () => {
-            const data = await User.findOne({
-              id: message.author.id,
-            });
-
-            if (data) {
-              data.update({
-                calendar: args[0],
-              });
-              data.save();
-
-              setTimeout(() => {
-                message.delete();
-                m.delete();
-              }, 3000);
-
-              return m.edit(
-                "<:tick:847460147789955092> Successfully updated your calendar!"
-              );
-            } else {
-              const newData = new User({
-                id: message.author.id,
-                calendar: args[0],
+            try {
+              const data = await prisma.main.findFirst({
+                where: {
+                  user: message.author.id,
+                },
               });
 
-              await newData.save();
+              if (data) {
+                await prisma.main.update({
+                  where: {
+                    user: message.author.id,
+                  },
+                  data: {
+                    url: args[0],
+                  },
+                });
 
-              setTimeout(() => {
-                message.delete();
-                m.delete();
-              }, 3000);
+                setTimeout(() => {
+                  message.delete();
+                  m.delete();
+                }, 3000);
 
-              return m.edit(
-                "<:tick:847460147789955092> Successfully added your calendar!"
-              );
+                return m.edit(
+                  "<:tick:847460147789955092> Successfully updated your calendar!"
+                );
+              } else {
+                await prisma.main.create({
+                  data: {
+                    user: message.author.id,
+                    url: args[0],
+                  },
+                });
+
+                setTimeout(() => {
+                  message.delete();
+                }, 3000);
+
+                return m.edit(
+                  "<:tick:847460147789955092> Successfully added your calendar!"
+                );
+              }
+            } catch (e) {
+              console.log(e);
             }
           })
-          .catch(() => {
+          .catch((e) => {
             return m.edit(
               "<:cross:847460147806994452> The calendar URL is invalid, is it publicly available?"
             );

@@ -1,6 +1,6 @@
 import Command from "../../struct/Command";
 import { Message } from "discord.js";
-import User from "../../../models/user";
+import prisma from "../../../database/export/Database";
 import { CalendarComponent, parseICS } from "ical";
 import axios from "axios";
 import { MessageEmbed } from "discord.js";
@@ -20,8 +20,10 @@ abstract class Next extends Command {
     return message.channel
       .send("<a:loading:847463122423513169> Loading...")
       .then(async (m) => {
-        const calendar = await User.findOne({
-          id: message.author.id,
+        const calendar = await prisma.main.findFirst({
+          where: {
+            user: message.author.id,
+          },
         });
 
         if (!calendar)
@@ -30,7 +32,7 @@ abstract class Next extends Command {
           );
 
         const ics: string = await axios
-          .get(calendar.calendar)
+          .get(calendar.url)
           .then((stuff) => stuff.data);
 
         const data = parseICS(ics);
@@ -95,6 +97,17 @@ abstract class Next extends Command {
             };
             break;
           }
+        }
+
+        if (!result) {
+          m.delete();
+          message.channel
+            .send("<@" + message.author.id + ">")
+            .then((msg) => msg.delete());
+
+          return message.channel.send(
+            "<:cross:847460147806994452> There are no more lessons. (Hooray, I guess?)"
+          );
         }
 
         const embed = new MessageEmbed()

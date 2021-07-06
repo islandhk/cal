@@ -3,6 +3,7 @@ node_modules
 
 # Env
 bot/src/bot/settings.ts
+.env
 
 # Dist
 dist/

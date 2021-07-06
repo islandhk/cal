@@ -2,6 +2,7 @@ import Command from "../../struct/Command";
 import { Message, MessageEmbed } from "discord.js";
 import prisma from "../../../database/export/Database";
 import axios from "axios";
+import { parseICS } from "ical";
 
 abstract class Add extends Command {
   constructor() {
@@ -42,12 +43,29 @@ abstract class Add extends Command {
         message.channel.send(helpEmbed2);
       });
 
+    if (
+      !args[0]
+        .toLowerCase()
+        .includes("tg.esf.edu.hk/public/icalendar/callink.php")
+    ) {
+      message.channel.send(
+        "<:cross:847460147806994452> That's not a Gateway URL. For more information, please review the information below:"
+      );
+      message.channel.send(helpEmbed1);
+      return message.channel.send(helpEmbed2);
+    }
+
     return message.channel
       .send("<a:loading:847463122423513169> Loading...")
       .then(async (m) => {
         await axios
           .get(args[0])
-          .then(async () => {
+          .then(async (res) => {
+            if (Object.entries(parseICS(res.data)).length == 0)
+              return m.edit(
+                "<:cross:847460147806994452> We can't process that URL - is it a calendar URL from The Gateway?"
+              );
+
             try {
               const data = await prisma.main.findFirst({
                 where: {
@@ -90,12 +108,14 @@ abstract class Add extends Command {
                 );
               }
             } catch (e) {
-              console.log(e);
+              return m.edit(
+                "<:cross:847460147806994452> There was an error while adding your calendar to the database. Please let "
+              );
             }
           })
-          .catch((e) => {
+          .catch(() => {
             return m.edit(
-              "<:cross:847460147806994452> The calendar URL is invalid, is it publicly available?"
+              "<:cross:847460147806994452> There was an error processing the URL, did you add https:// in front of it?"
             );
           });
       });

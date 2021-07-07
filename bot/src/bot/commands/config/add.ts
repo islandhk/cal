@@ -3,6 +3,28 @@ import { Message, MessageEmbed } from "discord.js";
 import prisma from "../../../database/export/Database";
 import axios from "axios";
 import { parseICS } from "ical";
+import parse from "../../../utils/parse";
+
+const helpEmbed1 = new MessageEmbed()
+  .setTitle("Okay, it looks like you're confused.")
+  .setDescription("*Don't worry, we'll take you through it...*")
+  .addField(
+    "Firstly, get on Gateway.",
+    "[Here you go!](https://tg.esf.edu.hk/)"
+  )
+  .addField(
+    'Next, click on "Sync to Google Calendar".',
+    "*It's above the calendar on the right hand side. Here's a picture...*"
+  )
+  .setImage("https://mcs.is-inside.me/RLgYt2U2.png");
+
+const helpEmbed2 = new MessageEmbed()
+  .addField('Now, hit the "Copy" button.', "*Altenatively, copy the URL.*")
+  .addField(
+    "Get on Discord...",
+    "*...and run `-a <your_url_without_<>s_here>` to get started!*"
+  )
+  .addField("Congrats!", "You're done!");
 
 abstract class Add extends Command {
   constructor() {
@@ -15,27 +37,6 @@ abstract class Add extends Command {
   }
 
   async exec(message: Message, args: string[]) {
-    const helpEmbed1 = new MessageEmbed()
-      .setTitle("Okay, it looks like you're confused.")
-      .setDescription("*Don't worry, we'll take you through it...*")
-      .addField(
-        "Firstly, get on Gateway.",
-        "[Here you go!](https://tg.esf.edu.hk/)"
-      )
-      .addField(
-        'Next, click on "Sync to Google Calendar".',
-        "*It's above the calendar on the right hand side. Here's a picture...*"
-      )
-      .setImage("https://mcs.is-inside.me/RLgYt2U2.png");
-
-    const helpEmbed2 = new MessageEmbed()
-      .addField('Now, hit the "Copy" button.', "*Altenatively, copy the URL.*")
-      .addField(
-        "Get on Discord...",
-        "*...and run `-a <your_url_without_<>s_here>` to get started!*"
-      )
-      .addField("Congrats!", "You're done!");
-
     if (!args[0])
       return message.channel.send("<@" + message.author.id + ">").then((m) => {
         m.delete();
@@ -61,7 +62,7 @@ abstract class Add extends Command {
         await axios
           .get(args[0])
           .then(async (res) => {
-            if (Object.entries(parseICS(res.data)).length == 0)
+            if (Object.entries(parse(res.data)).length == 0)
               return m.edit(
                 "<:cross:847460147806994452> We can't process that URL - is it a calendar URL from The Gateway?"
               );

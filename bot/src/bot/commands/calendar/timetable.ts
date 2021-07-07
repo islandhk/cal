@@ -1,10 +1,10 @@
 import Command from "../../struct/Command";
 import { Message } from "discord.js";
-import prisma from "../../../database/export/Database";
 import { parseICS } from "ical";
-import axios from "axios";
 import { MessageEmbed } from "discord.js";
 import { EventArray } from "../../types/Events";
+import getURL from "../../../utils/getURL";
+import getData from "../../../utils/getData";
 
 abstract class Timetable extends Command {
   constructor() {
@@ -20,20 +20,14 @@ abstract class Timetable extends Command {
     return message.channel
       .send("<a:loading:847463122423513169> Loading...")
       .then(async (m) => {
-        const calendar = await prisma.main.findFirst({
-          where: {
-            user: message.author.id,
-          },
-        });
+        const calendar = await getURL(message.author);
 
         if (!calendar)
           return m.edit(
             "<:cross:847460147806994452> Please add your calendar with `-add <url>`."
           );
 
-        const ics: string = await axios
-          .get(calendar.url)
-          .then(async (stuff) => await stuff.data);
+        const ics = await getData(calendar);
 
         const data = parseICS(ics);
 

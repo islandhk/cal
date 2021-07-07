@@ -2,7 +2,6 @@ import Command from "../../struct/Command";
 import { Message, MessageEmbed } from "discord.js";
 import prisma from "../../../database/export/Database";
 import axios from "axios";
-import { parseICS } from "ical";
 import parse from "../../../utils/parse";
 
 const helpEmbed1 = new MessageEmbed()

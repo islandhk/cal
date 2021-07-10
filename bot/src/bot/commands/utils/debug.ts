@@ -1,6 +1,7 @@
 import Command from "../../struct/Command";
 import { Message, MessageEmbed } from "discord.js";
 import prisma from "../../../database/export/Database";
+import getCache from "../../../utils/getCache";
 
 abstract class Help extends Command {
   constructor() {
@@ -30,11 +31,14 @@ abstract class Help extends Command {
         },
       });
 
+      const redis = await getCache(user);
+
       const embed1 = new MessageEmbed()
         .setTitle("Data for " + user.username)
         .setColor("RANDOM")
         .addField("ID", user.id)
-        .addField("In Database", data ? true : false);
+        .addField("In Database", data ? true : false)
+        .addField("In Redis", redis ? true : false);
 
       if (data) embed1.addField("Cal", data.url);
 

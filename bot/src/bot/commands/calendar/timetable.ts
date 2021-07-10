@@ -5,6 +5,8 @@ import { MessageEmbed } from "discord.js";
 import { EventArray } from "../../types/Events";
 import getURL from "../../../utils/getURL";
 import getData from "../../../utils/getData";
+import cacheData from "../../../utils/cacheData";
+import inCache from "../../../utils/inCache";
 
 abstract class Timetable extends Command {
   constructor() {
@@ -20,16 +22,26 @@ abstract class Timetable extends Command {
     return message.channel
       .send("<a:loading:847463122423513169> Loading...")
       .then(async (m) => {
-        const calendar = await getURL(message.author);
+        const userInCache = await inCache(message.author);
 
-        if (!calendar)
-          return m.edit(
-            "<:cross:847460147806994452> Please add your calendar with `-add <url>`."
-          );
+        let calendar: string | undefined | null = undefined;
+        let ics: string | null | undefined = undefined;
 
-        const ics = await getData(calendar);
+        if (userInCache) {
+          ics = userInCache;
+        } else {
+          calendar = await getURL(message.author);
 
-        const data = parseICS(ics);
+          if (!calendar)
+            return m.edit(
+              "<:cross:847460147806994452> Please add your calendar with `-add <url>`."
+            );
+
+          ics = await getData(calendar);
+          if (ics) await cacheData(message.author, ics!);
+        }
+
+        const data = parseICS(ics!);
 
         let result: EventArray = [];
 

@@ -3,6 +3,8 @@ import { Message, MessageEmbed } from "discord.js";
 import prisma from "../../../database/export/Database";
 import axios from "axios";
 import parse from "../../../utils/parse";
+import cache from "../../../cache/Cache";
+import getCache from "../../../utils/getCache";
 
 const helpEmbed1 = new MessageEmbed()
   .setTitle("Okay, it looks like you're confused.")
@@ -67,6 +69,9 @@ abstract class Add extends Command {
               );
 
             try {
+              if (getCache(message.author))
+                await cache.del("cal:" + message.author.id);
+
               const data = await prisma.main.findFirst({
                 where: {
                   user: message.author.id,

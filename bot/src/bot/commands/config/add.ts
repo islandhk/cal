@@ -63,20 +63,34 @@ abstract class Add extends Command {
         await axios
           .get(args[0])
           .then(async (res) => {
+            m.edit(
+              "<a:loading:847463122423513169> Loading... (attempting to parse data)"
+            );
             if (Object.entries(parse(res.data)).length == 0)
               return m.edit(
                 "<:cross:847460147806994452> We can't process that URL - is it a calendar URL from The Gateway?"
               );
 
             try {
+              m.edit(
+                "<a:loading:847463122423513169> Loading... (editing cache)"
+              );
               if (getCache(message.author))
                 await cache.del("cal:" + message.author.id);
+
+              m.edit(
+                "<a:loading:847463122423513169> Loading... (performing database checks)"
+              );
 
               const data = await prisma.main.findFirst({
                 where: {
                   user: message.author.id,
                 },
               });
+
+              m.edit(
+                "<a:loading:847463122423513169> Loading... (updating database)"
+              );
 
               if (data) {
                 await prisma.main.update({

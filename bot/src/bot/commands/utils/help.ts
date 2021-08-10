@@ -26,7 +26,7 @@ abstract class Help extends Command {
         **Description:** ${command.description}
       `)
       );
-      message.channel.send(embed);
+      message.channel.send({ embeds: [embed] });
     } else {
       const embed = new MessageEmbed().setColor("BLUE");
       const categories = this.removeDuplicates(
@@ -42,9 +42,12 @@ abstract class Help extends Command {
             commandNames.push(command[1].name);
           }
         }
-        embed.addField(category, commandNames.map((c) => `\`${c}\``).join(" "));
+        embed.addField(
+          category!,
+          commandNames.map((c) => `\`${c}\``).join(" ")
+        );
       }
-      message.channel.send(embed);
+      message.channel.send({ embeds: [embed] });
     }
   }
 

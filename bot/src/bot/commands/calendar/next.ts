@@ -90,7 +90,7 @@ abstract class Next extends Command {
             .send("<@" + message.author.id + ">")
             .then((msg) => msg.delete());
 
-          return message.channel.send(embed);
+          return message.channel.send({ embeds: [embed] });
         }
 
         for (let event in data) {
@@ -136,7 +136,7 @@ abstract class Next extends Command {
           .send("<@" + message.author.id + ">")
           .then((msg) => msg.delete());
 
-        return message.channel.send(embed);
+        return message.channel.send({ embeds: [embed] });
       });
   }
 }

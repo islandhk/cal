@@ -37,12 +37,12 @@ abstract class Help extends Command {
         .setTitle("Data for " + user.username)
         .setColor("RANDOM")
         .addField("ID", user.id)
-        .addField("In Database", data ? true : false)
-        .addField("In Redis", redis ? true : false);
+        .addField("In Database", `${data ? true : false}`)
+        .addField("In Redis", `${redis ? true : false}`);
 
       if (data) embed1.addField("Cal", data.url);
 
-      return message.channel.send(embed1);
+      return message.channel.send({ embeds: [embed1] });
     }
   }
 }

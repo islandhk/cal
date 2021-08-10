@@ -41,8 +41,8 @@ abstract class Add extends Command {
     if (!args[0])
       return message.channel.send("<@" + message.author.id + ">").then((m) => {
         m.delete();
-        message.channel.send(helpEmbed1);
-        message.channel.send(helpEmbed2);
+        message.channel.send({ embeds: [helpEmbed1] });
+        message.channel.send({ embeds: [helpEmbed2] });
       });
 
     if (
@@ -53,8 +53,8 @@ abstract class Add extends Command {
       message.channel.send(
         "<:cross:847460147806994452> That's not a Gateway URL. For more information, please review the information below:"
       );
-      message.channel.send(helpEmbed1);
-      return message.channel.send(helpEmbed2);
+      message.channel.send({ embeds: [helpEmbed1] });
+      return message.channel.send({ embeds: [helpEmbed2] });
     }
 
     return message.channel

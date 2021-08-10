@@ -18,7 +18,8 @@ class Bot extends Client {
   public constructor() {
     super({
       /* Discord JS Client Options */
-      disableMentions: "everyone",
+      intents: [],
+      allowedMentions: { parse: ["users", "roles"], repliedUser: true },
     });
 
     this.prefix = settings.PREFIX;

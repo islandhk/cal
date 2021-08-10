@@ -12,9 +12,13 @@ const registerEvents: Function = (client: Bot) => {
         const event: Event = new File();
         event.client = client;
         client.events.set(event.name, event);
-        client[event.type ? "once" : "on"](event.name, (...args: any[]) =>
-          event.exec(...args)
-        );
+        event.type
+          ? client.once(event.name, (...args: any[]) => {
+              event.exec(...args);
+            })
+          : client.on(event.name, (...args: any[]) => {
+              event.exec(...args);
+            });
       }
     }
   });

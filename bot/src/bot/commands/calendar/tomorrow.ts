@@ -90,7 +90,7 @@ abstract class Timetable extends Command {
 
         m.delete();
 
-        return message.channel.send(embed);
+        return message.channel.send({ embeds: [embed] });
       });
   }
 }

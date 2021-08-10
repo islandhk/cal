@@ -1,4 +1,4 @@
-# Cal
+# Cal for The Gateway
 
 > The calendar bot and website for The Gateway
 

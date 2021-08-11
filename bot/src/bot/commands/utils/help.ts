@@ -9,6 +9,14 @@ abstract class Help extends Command {
       aliases: ["h"],
       description: "Display a list of all commands",
       category: "Information",
+      args: [
+        {
+          name: "command",
+          description: "Name of the command you are querying.",
+          type: "STRING",
+          required: false,
+        },
+      ],
     });
   }
 

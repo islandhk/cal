@@ -16,8 +16,9 @@ const registerSlashCommands: Function = (client: Bot) => {
       }
     }
 
-    await client.guilds.cache.get("856508979265404960")?.commands.create(data);
+    await client.application?.commands.create(data);
   });
+  console.log("[Bot] Registered commands.");
 };
 
 export default registerSlashCommands;

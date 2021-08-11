@@ -1,5 +1,5 @@
 import Command from "../../struct/Command";
-import { Message, MessageEmbed } from "discord.js";
+import { CommandInteraction, Message, MessageEmbed } from "discord.js";
 import { stripIndents } from "common-tags";
 
 abstract class Help extends Command {
@@ -12,7 +12,7 @@ abstract class Help extends Command {
     });
   }
 
-  exec(message: Message, args: string[]) {
+  exec(message: CommandInteraction, args: string[]) {
     const command = this.client.commands.get(args[0]);
     if (command) {
       const embed = new MessageEmbed().setColor("BLUE");
@@ -26,7 +26,7 @@ abstract class Help extends Command {
         **Description:** ${command.description}
       `)
       );
-      message.channel.send({ embeds: [embed] });
+      message.reply({ embeds: [embed] });
     } else {
       const embed = new MessageEmbed().setColor("BLUE");
       const categories = this.removeDuplicates(
@@ -47,7 +47,7 @@ abstract class Help extends Command {
           commandNames.map((c) => `\`${c}\``).join(" ")
         );
       }
-      message.channel.send({ embeds: [embed] });
+      message.reply({ embeds: [embed] });
     }
   }
 

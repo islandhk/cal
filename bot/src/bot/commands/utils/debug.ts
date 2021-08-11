@@ -1,29 +1,36 @@
 import Command from "../../struct/Command";
-import { Message, MessageEmbed } from "discord.js";
+import { CommandInteraction, MessageEmbed, User } from "discord.js";
 import prisma from "../../../database/export/Database";
 import getCache from "../../../utils/getCache";
 
-abstract class Help extends Command {
+abstract class Debug extends Command {
   constructor() {
     super({
       name: "debug",
       aliases: ["read"],
-      description: "Display a list of all commands",
+      args: [
+        {
+          name: "user",
+          description: "The user to get information from.",
+          type: "USER",
+          required: false,
+        },
+      ],
+      description: "Read a user's information on Cal.",
       category: "Information",
       ownerOnly: true,
     });
   }
 
-  async exec(message: Message, args: string[]) {
-    const user =
-      message.mentions.users.first() ||
-      this.client.users.cache.get(args[0]) ||
-      message.author;
+  async exec(message: CommandInteraction, args: Array<User>) {
+    const user = args[0] || message.user;
 
     if (!user) {
-      return message.channel.send(
-        "<:cross:847460147806994452> Invalid user, please mention or provide user ID."
-      );
+      return message.reply({
+        content:
+          "<:cross:847460147806994452> Invalid user, please mention or provide user ID.",
+        ephemeral: true,
+      });
     } else {
       const data = await prisma.main.findFirst({
         where: {
@@ -42,9 +49,9 @@ abstract class Help extends Command {
 
       if (data) embed1.addField("Cal", data.url);
 
-      return message.channel.send({ embeds: [embed1] });
+      return message.reply({ embeds: [embed1], ephemeral: true });
     }
   }
 }
 
-export default Help;
+export default Debug;

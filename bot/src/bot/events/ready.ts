@@ -1,4 +1,5 @@
 import Event from "../struct/Event";
+import { SlashCommandRegistry } from "../struct/registries/export/RegistryIndex";
 
 abstract class ReadyEvent extends Event {
   constructor() {
@@ -11,6 +12,7 @@ abstract class ReadyEvent extends Event {
   async exec() {
     console.log("[Bot] Ready.");
     this.client.user?.setActivity("your calendar", { type: "WATCHING" });
+    SlashCommandRegistry(this.client);
   }
 }
 

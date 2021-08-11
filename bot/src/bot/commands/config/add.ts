@@ -34,17 +34,19 @@ abstract class Add extends Command {
       aliases: ["a"],
       description: "Add your calendar for viewing!",
       category: "Configuration",
+      ephermal: true,
+      args: [
+        {
+          name: "url",
+          description: "Your calendar URL from The Gateway.",
+          type: "STRING",
+          required: true,
+        },
+      ],
     });
   }
 
   async exec(message: Message, args: string[]) {
-    if (!args[0])
-      return message.channel.send("<@" + message.author.id + ">").then((m) => {
-        m.delete();
-        message.channel.send({ embeds: [helpEmbed1] });
-        message.channel.send({ embeds: [helpEmbed2] });
-      });
-
     if (
       !args[0]
         .toLowerCase()

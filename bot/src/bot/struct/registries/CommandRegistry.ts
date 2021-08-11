@@ -4,8 +4,9 @@ import { sync } from "glob";
 import { resolve } from "path";
 
 const registerCommands: Function = (client: Bot) => {
+  console.log("[Bot] Registering commands...");
   const commandFiles = sync(resolve(__dirname + "/../../commands/**/*"));
-  commandFiles.forEach((file) => {
+  commandFiles.forEach(async (file) => {
     if (/\.(j|t)s$/iu.test(file)) {
       const File = require(file).default;
       if (File && File.prototype instanceof Command) {

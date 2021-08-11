@@ -1,5 +1,5 @@
 import Command from "../../struct/Command";
-import { Message } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import { CalendarComponent, parseICS } from "ical";
 import { MessageEmbed } from "discord.js";
 import { Event } from "../../types/Events";
@@ -15,129 +15,112 @@ abstract class Next extends Command {
       aliases: ["n"],
       description: "View what the next lesson is.",
       category: "Calendar",
+      args: [
+        {
+          name: "lesson",
+          description: "The name of the lesson you are querying.",
+          type: "STRING",
+          required: false,
+        },
+      ],
     });
   }
 
-  async exec(message: Message, args: string[]) {
-    return message.channel
-      .send("<a:loading:847463122423513169> Loading...")
-      .then(async (m) => {
-        const userInCache = await inCache(message.author);
+  async exec(message: CommandInteraction, args: string[]) {
+    message.deferReply({ ephemeral: true });
+    const userInCache = await inCache(message.user);
 
-        let calendar: string | undefined | null = undefined;
-        let ics: string | null | undefined = undefined;
+    let calendar: string | undefined | null = undefined;
+    let ics: string | null | undefined = undefined;
 
-        if (userInCache) {
-          ics = userInCache;
-        } else {
-          calendar = await getURL(message.author);
+    if (userInCache) {
+      ics = userInCache;
+    } else {
+      calendar = await getURL(message.user);
 
-          if (!calendar)
-            return m.edit(
-              "<:cross:847460147806994452> Please add your calendar with `-add <url>`."
-            );
+      if (!calendar)
+        return message.editReply(
+          "<:cross:847460147806994452> Please add your calendar with `-add <url>`."
+        );
 
-          ics = await getData(calendar);
-          if (ics) await cacheData(message.author, ics!);
-        }
+      ics = await getData(calendar);
+      if (ics) await cacheData(message.user, ics!);
+    }
 
-        const data = parseICS(ics!);
+    const data = parseICS(ics!);
 
-        let result: Event | undefined;
+    let result: Event | undefined;
 
-        let date = new Date();
+    let date = new Date();
 
-        if (args[0]) {
-          for (let element in args) {
-            let first = args[element][0];
-            first = first.toUpperCase();
+    if (args[0]) {
+      let lesson = "";
 
-            args[element] = first + args[element].slice(1);
-          }
+      for (let word in args[0].split(" ")) {
+        let first = args[word][0];
+        first = first.toUpperCase();
 
-          const lesson = args.join(" ");
+        lesson = lesson + first + args[word].slice(1) + " ";
+      }
 
-          let embed = new MessageEmbed()
-            .setTitle("The next " + lesson + " lesson is on...")
-            .setColor("RANDOM");
+      let embed = new MessageEmbed()
+        .setTitle("The next " + lesson + " lesson is on...")
+        .setColor("RANDOM");
 
-          let check: CalendarComponent | undefined;
+      let check: CalendarComponent | undefined;
 
-          for (let event in data) {
-            let info = data[event];
+      for (let event in data) {
+        let info = data[event];
 
-            if (info.start! >= date) {
-              if (info.description?.includes(lesson)) {
-                check = info;
-                break;
-              }
-            }
-          }
-
-          if (!check) {
-            m.delete();
-            return message.channel.send(
-              "<:cross:847460147806994452> There is no lesson by that name."
-            );
-          } else {
-            embed.setDescription(
-              check.start!.toLocaleString() + " at " + check.location! + "."
-            );
-          }
-
-          m.delete();
-          message.channel
-            .send("<@" + message.author.id + ">")
-            .then((msg) => msg.delete());
-
-          return message.channel.send({ embeds: [embed] });
-        }
-
-        for (let event in data) {
-          let info = data[event];
-          if (info.start! >= date) {
-            result = {
-              name: info.description!.substring(9),
-              when: info.start!.toLocaleString(),
-              location: info.location!,
-            };
+        if (info.start! >= date) {
+          if (info.description?.includes(lesson)) {
+            check = info;
             break;
           }
         }
+      }
 
-        if (!result) {
-          m.delete();
-          message.channel
-            .send("<@" + message.author.id + ">")
-            .then((msg) => msg.delete());
+      if (!check) {
+        return message.editReply(
+          "<:cross:847460147806994452> There is no lesson by that name."
+        );
+      } else {
+        embed.setDescription(
+          check.start!.toLocaleString() + " at " + check.location! + "."
+        );
+      }
 
-          return message.channel.send(
-            "<:cross:847460147806994452> There are no more lessons. (Hooray, I guess?)"
-          );
-        }
+      return message.editReply({ embeds: [embed] });
+    }
 
-        const embed = new MessageEmbed()
-          .setColor("RANDOM")
-          .addField(
-            "Your next lesson is...",
-            result!.name +
-              " on " +
-              result!.when +
-              " at " +
-              result!.location +
-              "."
-          )
-          .setTimestamp()
-          .setFooter("Don't be late!");
+    for (let event in data) {
+      let info = data[event];
+      if (info.start! >= date) {
+        result = {
+          name: info.description!.substring(9),
+          when: info.start!.toLocaleString(),
+          location: info.location!,
+        };
+        break;
+      }
+    }
 
-        m.delete();
+    if (!result) {
+      return message.editReply(
+        "<:cross:847460147806994452> There are no more lessons. (Hooray, I guess?)"
+      );
+    }
 
-        message.channel
-          .send("<@" + message.author.id + ">")
-          .then((msg) => msg.delete());
+    const embed = new MessageEmbed()
+      .setColor("RANDOM")
+      .addField(
+        "Your next lesson is...",
+        result!.name + " on " + result!.when + " at " + result!.location + "."
+      )
+      .setTimestamp()
+      .setFooter("Don't be late!");
 
-        return message.channel.send({ embeds: [embed] });
-      });
+    return message.editReply({ embeds: [embed] });
   }
 }
 

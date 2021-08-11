@@ -1,5 +1,5 @@
 import Command from "../../struct/Command";
-import { Message } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import { parseICS } from "ical";
 import { MessageEmbed } from "discord.js";
 import { EventArray } from "../../types/Events";
@@ -18,82 +18,64 @@ abstract class Timetable extends Command {
     });
   }
 
-  async exec(message: Message) {
-    return message.channel
-      .send("<a:loading:847463122423513169> Loading...")
-      .then(async (m) => {
-        const userInCache = await inCache(message.author);
+  async exec(message: CommandInteraction) {
+    message.deferReply({ ephemeral: true });
+    const userInCache = await inCache(message.user);
 
-        let calendar: string | undefined | null = undefined;
-        let ics: string | null | undefined = undefined;
+    let calendar: string | undefined | null = undefined;
+    let ics: string | null | undefined = undefined;
 
-        if (userInCache) {
-          ics = userInCache;
-        } else {
-          calendar = await getURL(message.author);
+    if (userInCache) {
+      ics = userInCache;
+    } else {
+      calendar = await getURL(message.user);
 
-          if (!calendar)
-            return m.edit(
-              "<:cross:847460147806994452> Please add your calendar with `-add <url>`."
-            );
+      if (!calendar)
+        return message.editReply(
+          "<:cross:847460147806994452> Please add your calendar with `-add <url>`."
+        );
 
-          ics = await getData(calendar);
-          if (ics) await cacheData(message.author, ics!);
-        }
+      ics = await getData(calendar);
+      if (ics) await cacheData(message.user, ics!);
+    }
 
-        const data = parseICS(ics!);
+    const data = parseICS(ics!);
 
-        let result: EventArray = [];
+    let result: EventArray = [];
 
-        let date = new Date();
+    let date = new Date();
 
-        for (let event in data) {
-          const info = data[event];
+    for (let event in data) {
+      const info = data[event];
 
-          if (info.start?.toDateString() == date.toDateString()) {
-            result.push({
-              name: info.description!,
-              when: info.start!.toLocaleString(),
-              location: info.location!,
-            });
-          }
-        }
-
-        let embed = new MessageEmbed()
-          .setTitle("Timetable for " + date.toDateString())
-          .setColor("RANDOM")
-          .setTimestamp()
-          .setFooter(
-            "Timetable for " + message.author.tag + " • Don't be late!"
-          );
-
-        if (!result[0]) {
-          m.delete();
-
-          message.channel
-            .send("<@" + message.author.id + ">")
-            .then((msg) => msg.delete());
-
-          return message.channel.send(
-            "<:cross:847460147806994452> There are no lessons today."
-          );
-        }
-
-        result.map((x) => {
-          if (!x.name.includes("Subject"))
-            embed.addField(x.name, x.location + ", on " + x.when);
-          else
-            embed.addField(x.name.substring(9), x.location + ", on " + x.when);
+      if (info.start?.toDateString() == date.toDateString()) {
+        result.push({
+          name: info.description!,
+          when: info.start!.toLocaleString(),
+          location: info.location!,
         });
+      }
+    }
 
-        message.channel
-          .send("<@" + message.author.id + ">")
-          .then((msg) => msg.delete());
+    let embed = new MessageEmbed()
+      .setTitle("Timetable for " + date.toDateString())
+      .setColor("RANDOM")
+      .setTimestamp()
+      .setFooter("Timetable for " + message.user.tag + " • Don't be late!");
 
-        m.delete();
+    if (!result[0]) {
+      return message.editReply(
+        "<:cross:847460147806994452> There are no lessons today."
+      );
+    }
 
-        return message.channel.send({ embeds: [embed] });
-      });
+    result.map((x) => {
+      if (!x.name.includes("Subject"))
+        embed.addField(x.name, x.location + ", on " + x.when);
+      else embed.addField(x.name.substring(9), x.location + ", on " + x.when);
+    });
+
+    return message.editReply({ embeds: [embed] });
   }
 }
 

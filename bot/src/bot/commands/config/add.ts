@@ -34,7 +34,6 @@ abstract class Add extends Command {
       aliases: ["a"],
       description: "Add your calendar for viewing!",
       category: "Configuration",
-      ephermal: true,
       args: [
         {
           name: "url",
@@ -52,14 +51,19 @@ abstract class Add extends Command {
         .toLowerCase()
         .includes("tg.esf.edu.hk/public/icalendar/callink.php")
     ) {
-      message.reply(
-        "<:cross:847460147806994452> That's not a Gateway URL. For more information, please review the information below:"
-      );
-      message.followUp({ embeds: [helpEmbed1] });
-      return message.followUp({ embeds: [helpEmbed2] });
+      message.reply({
+        content:
+          "<:cross:847460147806994452> That's not a Gateway URL. For more information, please review the information below:",
+        ephemeral: true,
+      });
+      message.followUp({ embeds: [helpEmbed1], ephemeral: true });
+      return message.followUp({ embeds: [helpEmbed2], ephemeral: true });
     }
 
-    message.deferReply();
+    message.deferReply({
+      ephemeral: true,
+    });
+
     await axios
       .get(args[0])
       .then(async (res) => {
@@ -77,10 +81,6 @@ abstract class Add extends Command {
             },
           });
 
-          message.editReply(
-            "<a:loading:847463122423513169> Loading... (updating database)"
-          );
-
           if (data) {
             await prisma.main.update({
               where: {
@@ -91,9 +91,10 @@ abstract class Add extends Command {
               },
             });
 
-            return message.editReply(
-              "<:tick:847460147789955092> Successfully updated your calendar!"
-            );
+            return message.editReply({
+              content:
+                "<:tick:847460147789955092> Successfully updated your calendar!",
+            });
           } else {
             await prisma.main.create({
               data: {

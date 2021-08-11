@@ -19,7 +19,7 @@ abstract class Timetable extends Command {
   }
 
   async exec(message: CommandInteraction) {
-    message.deferReply({ ephemeral: true });
+    await message.deferReply({ ephemeral: true });
     const userInCache = await inCache(message.user);
 
     let calendar: string | undefined | null = undefined;

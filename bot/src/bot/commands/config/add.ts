@@ -60,7 +60,7 @@ abstract class Add extends Command {
       return message.followUp({ embeds: [helpEmbed2], ephemeral: true });
     }
 
-    message.deferReply({
+    await message.deferReply({
       ephemeral: true,
     });
 

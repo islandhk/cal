@@ -27,7 +27,7 @@ abstract class Next extends Command {
   }
 
   async exec(message: CommandInteraction, args: string[]) {
-    message.deferReply({ ephemeral: true });
+    await message.deferReply({ ephemeral: true });
     const userInCache = await inCache(message.user);
 
     let calendar: string | undefined | null = undefined;

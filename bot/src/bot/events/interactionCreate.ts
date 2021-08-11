@@ -11,8 +11,6 @@ abstract class interactionCreate extends Event {
 
   async exec(interaction: Interaction) {
     if (!interaction.isCommand()) return;
-    if (interaction.commandName == "ping")
-      interaction.reply("ello, geneva has done his first slash command");
 
     const command = this.client.commands.get(interaction.commandName);
     const user = interaction.user;

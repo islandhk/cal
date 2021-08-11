@@ -1,5 +1,5 @@
 import Command from "../../struct/Command";
-import { Message, MessageEmbed } from "discord.js";
+import { CommandInteraction, MessageEmbed } from "discord.js";
 import prisma from "../../../database/export/Database";
 import axios from "axios";
 import parse from "../../../utils/parse";
@@ -46,99 +46,76 @@ abstract class Add extends Command {
     });
   }
 
-  async exec(message: Message, args: string[]) {
+  async exec(message: CommandInteraction, args: string[]) {
     if (
       !args[0]
         .toLowerCase()
         .includes("tg.esf.edu.hk/public/icalendar/callink.php")
     ) {
-      message.channel.send(
+      message.reply(
         "<:cross:847460147806994452> That's not a Gateway URL. For more information, please review the information below:"
       );
-      message.channel.send({ embeds: [helpEmbed1] });
-      return message.channel.send({ embeds: [helpEmbed2] });
+      message.followUp({ embeds: [helpEmbed1] });
+      return message.followUp({ embeds: [helpEmbed2] });
     }
 
-    return message.channel
-      .send("<a:loading:847463122423513169> Loading...")
-      .then(async (m) => {
-        await axios
-          .get(args[0])
-          .then(async (res) => {
-            m.edit(
-              "<a:loading:847463122423513169> Loading... (attempting to parse data)"
-            );
-            if (Object.entries(parse(res.data)).length == 0)
-              return m.edit(
-                "<:cross:847460147806994452> We can't process that URL - is it a calendar URL from The Gateway?"
-              );
+    message.deferReply();
+    await axios
+      .get(args[0])
+      .then(async (res) => {
+        if (Object.entries(parse(res.data)).length == 0)
+          return message.editReply(
+            "<:cross:847460147806994452> We can't process that URL - is it a calendar URL from The Gateway?"
+          );
 
-            try {
-              m.edit(
-                "<a:loading:847463122423513169> Loading... (editing cache)"
-              );
-              if (getCache(message.author))
-                await cache.del("cal:" + message.author.id);
+        try {
+          if (getCache(message.user)) await cache.del("cal:" + message.user.id);
 
-              m.edit(
-                "<a:loading:847463122423513169> Loading... (performing database checks)"
-              );
-
-              const data = await prisma.main.findFirst({
-                where: {
-                  user: message.author.id,
-                },
-              });
-
-              m.edit(
-                "<a:loading:847463122423513169> Loading... (updating database)"
-              );
-
-              if (data) {
-                await prisma.main.update({
-                  where: {
-                    user: message.author.id,
-                  },
-                  data: {
-                    url: args[0],
-                  },
-                });
-
-                setTimeout(() => {
-                  message.delete();
-                  m.delete();
-                }, 3000);
-
-                return m.edit(
-                  "<:tick:847460147789955092> Successfully updated your calendar!"
-                );
-              } else {
-                await prisma.main.create({
-                  data: {
-                    user: message.author.id,
-                    url: args[0],
-                  },
-                });
-
-                setTimeout(() => {
-                  message.delete();
-                }, 3000);
-
-                return m.edit(
-                  "<:tick:847460147789955092> Successfully added your calendar!"
-                );
-              }
-            } catch (e) {
-              return m.edit(
-                "<:cross:847460147806994452> There was an error while adding your calendar to the database. Please let "
-              );
-            }
-          })
-          .catch(() => {
-            return m.edit(
-              "<:cross:847460147806994452> There was an error processing the URL, did you add https:// in front of it?"
-            );
+          const data = await prisma.main.findFirst({
+            where: {
+              user: message.user.id,
+            },
           });
+
+          message.editReply(
+            "<a:loading:847463122423513169> Loading... (updating database)"
+          );
+
+          if (data) {
+            await prisma.main.update({
+              where: {
+                user: message.user.id,
+              },
+              data: {
+                url: args[0],
+              },
+            });
+
+            return message.editReply(
+              "<:tick:847460147789955092> Successfully updated your calendar!"
+            );
+          } else {
+            await prisma.main.create({
+              data: {
+                user: message.user.id,
+                url: args[0],
+              },
+            });
+
+            return message.editReply(
+              "<:tick:847460147789955092> Successfully added your calendar!"
+            );
+          }
+        } catch (e) {
+          return message.editReply(
+            "<:cross:847460147806994452> There was an error while adding your calendar to the database. Please let "
+          );
+        }
+      })
+      .catch(() => {
+        return message.editReply(
+          "<:cross:847460147806994452> There was an error processing the URL, did you add https:// in front of it?"
+        );
       });
   }
 }

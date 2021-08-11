@@ -1,5 +1,5 @@
 import Command from "../../struct/Command";
-import { CommandInteraction, Message, MessageEmbed } from "discord.js";
+import { CommandInteraction, MessageEmbed } from "discord.js";
 import { stripIndents } from "common-tags";
 
 abstract class Help extends Command {

@@ -12,6 +12,12 @@ generator client {
 }
 
 model Main {
-  user String @unique
-  url  String @unique
+  user   String @unique
+  url    String
+  school School
+}
+
+enum School {
+  LPS
+  IS
 }

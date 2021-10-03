@@ -73,7 +73,8 @@ abstract class Add extends Command {
           );
 
         try {
-          if (getCache(message.user)) await cache.del("cal:" + message.user.id);
+          if (await getCache(message.user))
+            await cache.del("cal:" + message.user.id);
 
           const data = await prisma.main.findFirst({
             where: {
@@ -100,6 +101,7 @@ abstract class Add extends Command {
               data: {
                 user: message.user.id,
                 url: args[0],
+                school: "IS",
               },
             });
 

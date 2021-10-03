@@ -47,7 +47,8 @@ abstract class Debug extends Command {
         .addField("In Database", `${data ? true : false}`)
         .addField("In Redis", `${redis ? true : false}`);
 
-      if (data) embed1.addField("Cal", data.url);
+      if (data)
+        embed1.addField("Cal", data.url).addField("School", data.school);
 
       return message.reply({ embeds: [embed1], ephemeral: true });
     }

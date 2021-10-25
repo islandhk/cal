@@ -14,10 +14,10 @@ generator client {
 model Main {
   user   String @unique
   url    String
-  school School
+  service Service
 }
 
-enum School {
-  LPS
-  IS
+enum Service {
+  GCAL  
+  GATEWAY
 }

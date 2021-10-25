@@ -1,6 +1,6 @@
 import Command from "../../struct/Command";
 import { CommandInteraction, MessageEmbed } from "discord.js";
-import prisma from "../../../database/export/Database";
+import prisma from "../../../database/Database";
 import axios from "axios";
 import parse from "../../../utils/parse";
 import cache from "../../../cache/Cache";
@@ -101,7 +101,7 @@ abstract class Add extends Command {
               data: {
                 user: message.user.id,
                 url: args[0],
-                school: "IS",
+                service: "GATEWAY",
               },
             });
 

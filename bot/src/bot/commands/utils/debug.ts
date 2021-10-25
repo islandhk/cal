@@ -1,6 +1,6 @@
 import Command from "../../struct/Command";
 import { CommandInteraction, MessageEmbed, User } from "discord.js";
-import prisma from "../../../database/export/Database";
+import prisma from "../../../database/Database";
 import getCache from "../../../utils/getCache";
 
 abstract class Debug extends Command {
@@ -48,7 +48,7 @@ abstract class Debug extends Command {
         .addField("In Redis", `${redis ? true : false}`);
 
       if (data)
-        embed1.addField("Cal", data.url).addField("School", data.school);
+        embed1.addField("Cal", data.url).addField("Service", data.service);
 
       return message.reply({ embeds: [embed1], ephemeral: true });
     }

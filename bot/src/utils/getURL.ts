@@ -1,5 +1,5 @@
 import { User } from "discord.js";
-import prisma from "../database/export/Database";
+import prisma from "../database/Database";
 
 export default async function getURL(user: User) {
   return await prisma.main

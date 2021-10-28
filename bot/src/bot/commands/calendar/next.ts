@@ -7,6 +7,8 @@ import getURL from "../../../utils/getURL";
 import getData from "../../../utils/getData";
 import inCache from "../../../utils/inCache";
 import cacheData from "../../../utils/cacheData";
+import getCalendarFormat from "../../../utils/getCalendarFormat";
+import { Platform } from "../../types/Utils";
 
 abstract class Next extends Command {
   constructor() {
@@ -17,8 +19,8 @@ abstract class Next extends Command {
       category: "Calendar",
       args: [
         {
-          name: "lesson",
-          description: "The name of the lesson you are querying.",
+          name: "event",
+          description: "The name of the event you are querying.",
           type: "STRING",
           required: false,
         },
@@ -32,6 +34,7 @@ abstract class Next extends Command {
 
     let calendar: string | undefined | null = undefined;
     let ics: string | null | undefined = undefined;
+    const calendarFormat = await getCalendarFormat(message.user);
 
     if (userInCache) {
       ics = userInCache;
@@ -53,53 +56,98 @@ abstract class Next extends Command {
 
     let date = new Date();
 
+    // If argument is detected, search for that event
     if (args[0]) {
-      let lesson = "";
+      let event = "";
 
-      for (let word in args[0].split(" ")) {
-        let first = args[word][0];
-        first = first.toUpperCase();
+      if (calendarFormat == Platform.Gateway) {
+        for (let word in args[0].split(" ")) {
+          let first = args[word][0];
+          first = first.toUpperCase();
 
-        lesson = lesson + first + args[word].slice(1) + " ";
-      }
+          event = event + first + args[word].slice(1) + " ";
+        }
 
-      let embed = new MessageEmbed()
-        .setTitle("The next " + lesson + " lesson is on...")
-        .setColor("RANDOM");
+        let embed = new MessageEmbed()
+          .setTitle("The next " + event + " lesson is on...")
+          .setColor("RANDOM");
 
-      let check: CalendarComponent | undefined;
+        let check: CalendarComponent | undefined;
 
-      for (let event in data) {
-        let info = data[event];
+        for (let event in data) {
+          let info = data[event];
 
-        if (info.start! >= date) {
-          if (info.description?.includes(lesson)) {
-            check = info;
-            break;
+          if (info.start! >= date) {
+            if (info.description?.includes(event)) {
+              check = info;
+              break;
+            }
           }
         }
-      }
 
-      if (!check) {
-        return message.editReply(
-          "<:cross:847460147806994452> There is no lesson by that name."
-        );
-      } else {
-        embed.setDescription(
-          check.start!.toLocaleString() + " at " + check.location! + "."
-        );
-      }
+        if (!check) {
+          return message.editReply(
+            "<:cross:847460147806994452> There is no lesson by that name."
+          );
+        } else {
+          embed.setDescription(
+            check.start!.toLocaleString() + " at " + check.location! + "."
+          );
+        }
 
-      return message.editReply({ embeds: [embed] });
+        return message.editReply({ embeds: [embed] });
+      } else if (calendarFormat == Platform.GCal) {
+        event = args[0].toLowerCase();
+        let embed = new MessageEmbed()
+          .setTitle(event + " is on...")
+          .setColor("RANDOM");
+
+        let check: CalendarComponent | undefined;
+
+        for (let entry in data) {
+          let info = data[entry];
+
+          if (info.start! >= date) {
+            //  console.log(event);
+            console.log(info.summary);
+            // console.log(info.summary?.toLowerCase().includes(event));
+            if (info.summary?.toLowerCase().includes(event)) {
+              check = info;
+              break;
+            }
+          }
+        }
+
+        if (!check) {
+          return message.editReply(
+            "<:cross:847460147806994452> There is no event by that name."
+          );
+        } else {
+          const location =
+            check.location! == undefined || check.location! == ""
+              ? ""
+              : "at " + check.location!;
+
+          embed.setDescription(check.start!.toLocaleString() + location! + ".");
+        }
+
+        return message.editReply({ embeds: [embed] });
+      }
     }
-
+    // No argument, look for the next event.
     for (let event in data) {
       let info = data[event];
       if (info.start! >= date) {
         result = {
-          name: info.description!.substring(9),
+          name:
+            calendarFormat == Platform.Gateway
+              ? info.description!.substring(9)
+              : info.summary!,
           when: info.start!.toLocaleString(),
-          location: info.location!,
+          location:
+            info.location! == undefined || info.location! == ""
+              ? ""
+              : "at " + info.location!,
         };
         break;
       }
@@ -114,8 +162,8 @@ abstract class Next extends Command {
     const embed = new MessageEmbed()
       .setColor("RANDOM")
       .addField(
-        "Your next lesson is...",
-        result!.name + " on " + result!.when + " at " + result!.location + "."
+        "Your next event is...",
+        result!.name + " on " + result!.when + result.location
       )
       .setTimestamp()
       .setFooter("Don't be late!");

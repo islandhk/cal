@@ -7,6 +7,8 @@ import getURL from "../../../utils/getURL";
 import getData from "../../../utils/getData";
 import cacheData from "../../../utils/cacheData";
 import inCache from "../../../utils/inCache";
+import getCalendarFormat from "../../../utils/getCalendarFormat";
+import { Platform } from "../../types/Utils";
 
 abstract class Tomorrow extends Command {
   constructor() {
@@ -50,13 +52,26 @@ abstract class Tomorrow extends Command {
       const info = data[event];
 
       if (info.start?.toDateString() == date.toDateString()) {
+        console.log(info);
+        const name =
+          (await getCalendarFormat(message.user)) == Platform.Gateway
+            ? info.description!.substring(9)
+            : info.summary!;
+
+        const location =
+          info.location! == undefined || info.location! == ""
+            ? ""
+            : info.location! + ",";
+
         result.push({
-          name: info.description!.substring(9),
+          name,
           when: info.start!.toLocaleString(),
-          location: info.location!,
+          location,
         });
       }
     }
+
+    console.log(result);
 
     let embed = new MessageEmbed()
       .setTitle("Timetable for " + date.toDateString())
@@ -66,12 +81,12 @@ abstract class Tomorrow extends Command {
 
     if (!result[0]) {
       return message.editReply(
-        "<:cross:847460147806994452> There are no lessons tomorrow."
+        "<:cross:847460147806994452> There are no events tomorrow."
       );
     }
 
     result.map((x) => {
-      embed.addField(x.name, x.location + ", on " + x.when);
+      embed.addField(x.name, x.location + " on " + x.when);
     });
 
     return message.editReply({ embeds: [embed] });

@@ -12,7 +12,7 @@ abstract class interactionCreate extends Event {
   async exec(interaction: Interaction) {
     if (!interaction.isCommand()) return;
 
-    const command = this.client.commands.get(interaction.commandName);
+    const command = this.client.commands.get(interaction.commandName.slice(5));
     const user = interaction.user;
 
     if (command) {
@@ -61,6 +61,7 @@ abstract class interactionCreate extends Event {
       }
 
       try {
+        console.log("[Interaction] " + user.tag + " used " + command.name);
         return command.exec(interaction, args);
       } catch (error) {
         console.log(error);

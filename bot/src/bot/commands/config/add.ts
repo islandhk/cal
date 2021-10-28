@@ -1,11 +1,15 @@
 import Command from "../../struct/Command";
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import prisma from "../../../database/Database";
 import axios from "axios";
 import parse from "../../../utils/parse";
 import cache from "../../../cache/Cache";
 import getCache from "../../../utils/getCache";
+import determineService from "../../../utils/determineService";
+import { Service } from "prisma/prisma-client";
+import { Platform } from "../../types/Utils";
 
+/*
 const helpEmbed1 = new MessageEmbed()
   .setTitle("Okay, it looks like you're confused.")
   .setDescription("*Don't worry, we'll take you through it...*")
@@ -26,6 +30,7 @@ const helpEmbed2 = new MessageEmbed()
     "*...and run `-a <your_url_without_<>s_here>` to get started!*"
   )
   .addField("Congrats!", "You're done!");
+*/
 
 abstract class Add extends Command {
   constructor() {
@@ -46,30 +51,33 @@ abstract class Add extends Command {
   }
 
   async exec(message: CommandInteraction, args: string[]) {
-    if (
-      !args[0]
-        .toLowerCase()
-        .includes("tg.esf.edu.hk/public/icalendar/callink.php")
-    ) {
-      message.reply({
+    const service = determineService(args[0]);
+    let prismaService: Service;
+
+    if (service == Platform.GCal) prismaService = "GCAL";
+    else if (service == Platform.Gateway) prismaService = "GATEWAY";
+
+    if (!service) {
+      return message.reply({
         content:
-          "<:cross:847460147806994452> That's not a Gateway URL. For more information, please review the information below:",
+          "<:cross:847460147806994452> That's not a valid URL. Please enter a Google Calendar or a Gateway URL.",
         ephemeral: true,
       });
-      message.followUp({ embeds: [helpEmbed1], ephemeral: true });
-      return message.followUp({ embeds: [helpEmbed2], ephemeral: true });
     }
 
     await message.deferReply({
       ephemeral: true,
     });
 
+    if (!args[0].startsWith("https://") && !args[0].includes("https://"))
+      args[0] = "https://" + args[0];
+
     await axios
       .get(args[0])
       .then(async (res) => {
         if (Object.entries(parse(res.data)).length == 0)
           return message.editReply(
-            "<:cross:847460147806994452> We can't process that URL - is it a calendar URL from The Gateway?"
+            "<:cross:847460147806994452> We can't process that URL - is that a valid URL and did you add `https://`?"
           );
 
         try {
@@ -89,6 +97,7 @@ abstract class Add extends Command {
               },
               data: {
                 url: args[0],
+                service: prismaService,
               },
             });
 
@@ -101,7 +110,7 @@ abstract class Add extends Command {
               data: {
                 user: message.user.id,
                 url: args[0],
-                service: "GATEWAY",
+                service: prismaService,
               },
             });
 
@@ -110,6 +119,7 @@ abstract class Add extends Command {
             );
           }
         } catch (e) {
+          console.log(e);
           return message.editReply(
             "<:cross:847460147806994452> There was an error while adding your calendar to the database. Please let "
           );
